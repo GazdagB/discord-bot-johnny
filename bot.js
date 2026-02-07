@@ -4,21 +4,27 @@ dotenv.config();
 import { Client, Events, GatewayIntentBits } from 'discord.js';
 
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ 
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ] 
+});
 
 client.on(Events.ClientReady, readyClient => {
   console.log(`Logged in as ${readyClient.user.tag}!`);
 });
 
-client.on(Events.InteractionCreate, async interaction => {
-  if (!interaction.isChatInputCommand()) return;
+// Listen for text messages and respond to "ping" with "Pong!"
+client.on(Events.MessageCreate, async message => {
+  // Ignore messages from bots (including itself)
+  if (message.author.bot) return;
 
-  if (interaction.commandName === 'ping') {
-    await interaction.reply('Pong!');
+  if (message.content.toLowerCase() === 'ping') {
+    await message.reply('Pong!');
   }
 });
 
-console.log('Token:', process.env.DISCORD_API_KEY ? 'Found' : 'NOT FOUND');
-console.log('Token length:', process.env.DISCORD_API_KEY?.length);
 client.login(process.env.DISCORD_API_KEY);
 
